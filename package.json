@@ -1,0 +1,20 @@
+{
+  "name": "moza",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "nju33 <nju33.ki@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "glob": "^7.1.2",
+    "got": "^7.1.0",
+    "ink": "^0.3.1",
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.2",
+    "yargs": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/glob": "^5.0.32",
+    "@types/node": "^8.0.30",
+    "@types/yargs": "^8.0.2"
+  }
+}

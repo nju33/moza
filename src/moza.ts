@@ -34,6 +34,7 @@ import {loadFile, parse} from './helpers';
           });
         });
 
+        b.demandOption(part.options.map(opt => opt.var))
         b.help('help');
 
         return b;
@@ -47,9 +48,17 @@ import {loadFile, parse} from './helpers';
         //   .help('help')
         // .argv;
       }, async function (argv){
+        const {aaa, bbb, ccc}: {[key: string]: string} = Object.keys(argv).reduce((flags: any, key) => {
+          if (part.options.map(opt => opt.var).indexOf(key) === -1) {
+            return flags;
+          }
+          flags[key] = argv[key];
+          return flags;
+        }, {});
+
+        console.log(aaa, bbb, ccc);
         // const contents = await loadFile(filename);
         // console.log(parse(contents));
-        console.log(argv);
         // console.log(arguments);
       })
       .help()

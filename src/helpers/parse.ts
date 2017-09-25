@@ -1,4 +1,7 @@
-export function parse(contents: string): any {
+export function parse(contents: string): Array<{
+  default: string;
+  var: string;
+}> {
   const matches = contents.match( /{.+?}/g);
 
   if (matches === null) {

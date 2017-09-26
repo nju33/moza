@@ -21,8 +21,7 @@ import {loadFile, parse} from './helpers';
     const parts = await Promise.all(promises);
 
     parts.forEach(part => {
-
-      const a = yargs.command(path.basename(part.filename), 'test', b => {
+      yargs.command(path.basename(part.filename), 'test', b => {
         b.usage('aaa');
 
         console.log(part.options)
@@ -38,31 +37,24 @@ import {loadFile, parse} from './helpers';
         b.help('help');
 
         return b;
-
-        // return b
-        //   .usage('aaa')
-        //   .option('aa', {
-        //     alias: 'a',
-        //     description: 'help',
-        //   })
-        //   .help('help')
-        // .argv;
       }, async function (argv){
-        const {aaa, bbb, ccc}: {[key: string]: string} = Object.keys(argv).reduce((flags: any, key) => {
-          if (part.options.map(opt => opt.var).indexOf(key) === -1) {
-            return flags;
-          }
-          flags[key] = argv[key];
-          return flags;
-        }, {});
-
-        console.log(aaa, bbb, ccc);
+        console.log(argv);
+        // const {aaa, bbb, ccc}: {[key: string]: string} = Object.keys(argv).reduce((flags: any, key) => {
+        //   if (part.options.map(opt => opt.var).indexOf(key) === -1) {
+        //     return flags;
+        //   }
+        //   flags[key] = argv[key];
+        //   return flags;
+        // }, {});
+        //
+        // console.log(aaa, bbb, ccc);
         // const contents = await loadFile(filename);
         // console.log(parse(contents));
         // console.log(arguments);
-      })
-      .help()
-      .argv;
+      });
+      // .help()
+      // .argv;
     });
+    yargs.argv;
   });
 })();

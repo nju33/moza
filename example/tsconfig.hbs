@@ -1,9 +1,14 @@
 ---
 filename: tsconfig.json
+description: test description
+usage: 'aaa'
+
 lib:
   - es2015
   - es2016
   - es2017
+target: es5
+module: commonjs
 ---
 
 
@@ -13,7 +18,7 @@ lib:
     "module": "commonjs",
     "lib": [
       {{#each lib}}
-      "{{this}}"{{#unless @last}},{{/unless}}
+      {{{dq this}}}{{#unless @last}},{{/unless}}
       {{/each}}
     ],
     "strict": true

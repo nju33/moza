@@ -5,12 +5,14 @@
   "author": "nju33 <nju33.ki@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "clear": "^0.0.1",
     "glob": "^7.1.2",
     "got": "^7.1.0",
     "gray-matter": "^3.0.7",
     "handlebars": "^4.0.10",
     "ink": "^0.3.1",
     "ramda": "^0.24.1",
+    "term-size": "^1.2.0",
     "tslint": "^5.7.0",
     "typescript": "^2.5.2",
     "yargs": "^9.0.1"

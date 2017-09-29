@@ -1,7 +1,8 @@
+import * as fs from 'fs';
 import * as glob from 'glob';
 import matter = require('gray-matter');
 import * as Handlebars from 'handlebars';
-import {h, render, Component, Text} from 'ink';
+import {h, render} from 'ink';
 import * as path from 'path';
 import * as R from 'ramda';
 import {promisify} from 'util';
@@ -9,16 +10,12 @@ import * as yargs from 'yargs';
 import {loadFile, parse} from './helpers';
 import {Less} from './less';
 
-console.log(h)
-console.log(render)
-console.log(Component)
-
-process.on('unhandledRejection', function(reason, p) {
+process.on('unhandledRejection', (reason, p) => {
+  // tslint:disable-next-line
   console.error(reason);
 });
 
 Handlebars.registerHelper('wrap', (mark: string, str: string) => {
-  console.log(mark, str);
   return `${mark}${str}${mark}`;
 });
 
@@ -83,7 +80,7 @@ Handlebars.registerHelper('dq', (str: string) => {
 
           ctx.flags.forEach(flag => {
             b.option(flag, {
-              default: ctx.data[flag]
+              default: ctx.data[flag],
             });
           });
 
@@ -100,6 +97,7 @@ Handlebars.registerHelper('dq', (str: string) => {
           return b;
         },
         async argv => {
+          // tslint:disable-next-line
           const flags = ctx.flags.reduce((result, flag) => {
             if (typeof argv[flag] !== 'undefined') {
               result[flag] = argv[flag];
@@ -109,16 +107,28 @@ Handlebars.registerHelper('dq', (str: string) => {
 
           // console.log(Object.assign({}, ctx.data, flags));
           const result = Handlebars.compile(ctx.content)(
-            Object.assign({}, ctx.data, flags)
+            Object.assign({}, ctx.data, flags),
           );
           // const result = Object.keys(ctx.flags).reduce((a: string, varname: string) => {
           //   return a.replace(new RegExp('{' + varname + '.*}'), ctx.flags[varname]);
           // }, ctx.content);
           // console.log(result);
-          console.log(Less)
+          // tslint:disable-next-line
+          console.log(Less);
           // render(<Text>aldkfjalskdjf</Text>);
-          render(<Less/>);
-        }
+          render(
+            <Less
+              content={result.trim()}
+              save={() => {
+                fs.writeFileSync(
+                  path.resolve(`example/${ctx.data.filename}`),
+                  result.trim(),
+                  'utf-8',
+                );
+              }}
+            />,
+          );
+        },
       );
       // .help()
       // .argv;

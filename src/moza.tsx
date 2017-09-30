@@ -7,7 +7,7 @@ import * as path from 'path';
 import * as R from 'ramda';
 import {promisify} from 'util';
 import * as yargs from 'yargs';
-import {loadFile, parse} from './helpers';
+import {formatMatter, loadFile, parse} from './helpers';
 import {Less} from './less';
 
 process.on('unhandledRejection', (reason, p) => {
@@ -35,29 +35,14 @@ Handlebars.registerHelper('dq', (str: string) => {
   glob(filePattern, async (err, filenames) => {
     const promises = filenames.map(async filename => {
       const content = await loadFile(filename);
-      const ctx = matter(content);
+      const ctx = formatMatter(matter(content));
       return {
         filename,
         ...ctx,
         get flags() {
           return Object.keys(ctx.data);
         },
-        // get classifiedFlags(): Array<[string[], string[]]> {
-        //   return this.flags.reduce((acc, flag) => {
-        //     if (ctx.data[flag] === null) {
-        //       acc[0].push(flag);
-        //     } else {
-        //       acc[1].push(flag);
-        //     }
-        //     return acc;
-        //   }, [[], []]);
-        // }
       };
-      // return {
-      //   contents,
-      //   filename,
-      //   options: parse(contents),
-      // };
     });
 
     const ctxs: {[key: string]: any} = await Promise.all(promises);
@@ -73,28 +58,11 @@ Handlebars.registerHelper('dq', (str: string) => {
       yargs.command(
         path.basename(ctx.filename, '.hbs'),
         ctx.description || false,
-        b => {
-          if (ctx.usage) {
-            b.usage('aaa');
-          }
-
+        command => {
           ctx.flags.forEach(flag => {
-            b.option(flag, {
-              default: ctx.data[flag],
-            });
+            command.option(flag, ctx.data[flag]);
           });
-
-          // ctx.options.forEach((opt: any) => {
-          //   b.option(opt.var, {
-          //     default: opt.default,
-          //     type: 'string',
-          //   });
-          // });
-
-          // b.demandOption(requiredFlags);
-          b.help('help');
-
-          return b;
+          return command.usage(ctx.usage || null).help('help');
         },
         async argv => {
           // tslint:disable-next-line

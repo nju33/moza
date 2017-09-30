@@ -3,10 +3,16 @@ filename: tsconfig.json
 description: test description
 usage: 'aaa'
 
+
+hoge:
+  alias: h
+  demandOption: true
 lib:
-  - es2015
-  - es2016
-  - es2017
+  alias: l
+  default:
+    - es2015
+    - es2016
+    - es2017
 target: es5
 module: commonjs
 ---
@@ -14,7 +20,7 @@ module: commonjs
 
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": {{{dq target}}},
     "module": "commonjs",
     "lib": [
       {{#each lib}}

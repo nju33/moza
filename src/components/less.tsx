@@ -1,34 +1,35 @@
 import * as clear from 'clear';
 import {Component, h, render} from 'ink';
-import termSize = require('term-size');
 
 export class Less extends Component {
-  public props: {content: string; save(): void};
+  public props: {rows: number; content: string; save(): void};
   public state: any;
   private setState: any;
 
-  constructor(props) {
+  private constructor(props) {
     super(props);
 
+    const contentLineLength = props.content.split('\n').length;
     this.state = {
-      ...termSize(),
-      contentLineLength: props.content.split('\n').length,
+      contentLineLength,
+      rows: contentLineLength < props.rows ? contentLineLength : props.rows,
       scrollLine: 0,
     };
+    // console.log(this.state);
+    // process.exit(0);
   }
 
-  get visibleContent() {
+  private get viewableContent() {
     return this.props.content
       .split('\n')
+      .concat(Array(this.state.rows).fill(''))
       .slice(this.state.scrollLine, this.state.scrollLine + this.state.rows)
       .join('\n');
   }
 
   public render(props) {
-    // return <Text green>{this.state.i} tests passed</Text>;
-    // tslint:disable-next-line
     clear();
-    return <div>{this.visibleContent}</div>;
+    return <div>{this.viewableContent}</div>;
   }
 
   public scroll(num: number) {
@@ -59,9 +60,9 @@ export class Less extends Component {
           }
           break;
         }
+        case 'return' /* enter */:
         case 'y': {
           this.props.save();
-          process.exit(0);
         }
         case 'n':
         default:

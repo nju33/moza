@@ -2,17 +2,16 @@ import * as fs from 'fs';
 import * as glob from 'glob';
 import matter = require('gray-matter');
 import * as Handlebars from 'handlebars';
-import {h, render} from 'ink';
+import {Component, h, render, Text} from 'ink';
 import * as path from 'path';
 import * as R from 'ramda';
 import {promisify} from 'util';
 import * as yargs from 'yargs';
+import {FlexCol, Less} from './components';
 import {formatMatter, loadFile, parse} from './helpers';
-import {FlexCol} from './components/flex-col';
-import {Less} from './components/less';
 
 process.on('unhandledRejection', (reason, p) => {
-  // tslint:disable-next-line
+  // tslint:disable-next-line no-console
   console.error(reason);
 });
 
@@ -28,10 +27,67 @@ Handlebars.registerHelper('dq', (str: string) => {
   return `"${str}"`;
 });
 
+class Container extends Component {
+  private props: {
+    content: string;
+    flags: {
+      filename: string;
+      [prop: string]: any;
+    };
+  };
+
+  private state: {
+    saved: boolean;
+  };
+
+  private constructor(props) {
+    super(props);
+    this.state = {
+      saved: false,
+    };
+  }
+
+  public componentDidUpdate() {
+    if (this.state.saved) {
+      process.exit(0);
+    }
+  }
+
+  public render() {
+    return (
+      <FlexCol>
+        <Less
+          content={this.props.content}
+          save={() => {
+            fs.writeFileSync(
+              path.resolve(`example/${this.props.flags.filename}`),
+              this.props.content,
+              'utf-8',
+            );
+            (this as any).setState({
+              saved: true,
+            });
+          }}
+        />
+        <div>
+          <div />
+          <div>
+            » Save? <Text blue>y</Text>/n <Text gray>:: down:j up:k</Text>
+          </div>
+          {this.state.saved ? (
+            <Text>
+              » Created to{' '}
+              {path.resolve(`example/${this.props.flags.filename}`)}
+            </Text>
+          ) : null}
+        </div>
+      </FlexCol>
+    );
+  }
+}
+
 (async () => {
   const filePattern = path.join(process.cwd(), 'example/*');
-  // const filenames = await promisify(glob)(filePattern, {}, () => {});
-  // console.log(filenames);
 
   glob(filePattern, async (err, filenames) => {
     const promises = filenames.map(async filename => {
@@ -48,14 +104,7 @@ Handlebars.registerHelper('dq', (str: string) => {
 
     const ctxs: {[key: string]: any} = await Promise.all(promises);
 
-    // ctxs.forEach(part => {
-    //   part.pick = R.pick(part.options.map(opt => opt.var));
-    // });
-
     ctxs.forEach(ctx => {
-      // const [requiredFlags, nonRequiredFlags] = ctx.classifiedFlags;
-      // console.log(requiredFlags, nonRequiredFlags);
-
       yargs.command(
         path.basename(ctx.filename, '.hbs'),
         ctx.description || false,
@@ -66,45 +115,25 @@ Handlebars.registerHelper('dq', (str: string) => {
           return command.usage(ctx.usage || null).help('help');
         },
         async argv => {
-          // tslint:disable-next-line
-          const flags = ctx.flags.reduce((result, flag) => {
+          const flags = ctx.flags.reduce((acc, flag) => {
             if (typeof argv[flag] !== 'undefined') {
-              result[flag] = argv[flag];
+              if (argv[flag]) {
+                acc[flag] = argv[flag];
+              } else if (ctx.data[flag].default) {
+                acc[flag] = ctx.data[flag].default;
+              }
             }
-            return result;
+            return acc;
           }, {});
 
-          // console.log(Object.assign({}, ctx.data, flags));
           const result = Handlebars.compile(ctx.content)(
             Object.assign({}, ctx.data, flags),
           );
-          // const result = Object.keys(ctx.flags).reduce((a: string, varname: string) => {
-          //   return a.replace(new RegExp('{' + varname + '.*}'), ctx.flags[varname]);
-          // }, ctx.content);
-          // console.log(result);
-          // tslint:disable-next-line
-          console.log(Less);
-          // render(<Text>aldkfjalskdjf</Text>);
-          render(
-            <FlexCol>
-              <Less
-                content={result.trim()}
-                save={() => {
-                  fs.writeFileSync(
-                    path.resolve(`example/${ctx.data.filename}`),
-                    result.trim(),
-                    'utf-8',
-                  );
-                }}
-              />
-              <div>hogehoge fugagfuaga</div>
-            </FlexCol>,
-          );
+
+          render(<Container content={result.trim()} flags={flags} />);
         },
       );
-      // .help()
-      // .argv;
     });
-    yargs.argv;
+    return yargs.argv;
   });
 })();

@@ -8,7 +8,8 @@ import * as R from 'ramda';
 import {promisify} from 'util';
 import * as yargs from 'yargs';
 import {formatMatter, loadFile, parse} from './helpers';
-import {Less} from './less';
+import {FlexCol} from './components/flex-col';
+import {Less} from './components/less';
 
 process.on('unhandledRejection', (reason, p) => {
   // tslint:disable-next-line
@@ -85,16 +86,19 @@ Handlebars.registerHelper('dq', (str: string) => {
           console.log(Less);
           // render(<Text>aldkfjalskdjf</Text>);
           render(
-            <Less
-              content={result.trim()}
-              save={() => {
-                fs.writeFileSync(
-                  path.resolve(`example/${ctx.data.filename}`),
-                  result.trim(),
-                  'utf-8',
-                );
-              }}
-            />,
+            <FlexCol>
+              <Less
+                content={result.trim()}
+                save={() => {
+                  fs.writeFileSync(
+                    path.resolve(`example/${ctx.data.filename}`),
+                    result.trim(),
+                    'utf-8',
+                  );
+                }}
+              />
+              <div>hogehoge fugagfuaga</div>
+            </FlexCol>,
           );
         },
       );

@@ -89,11 +89,15 @@ async function makeCtx(filename: string): Promise<Context> {
             })(),
             command => {
               ctx.flags.forEach(flag => {
+                if (flag === 'CONFIG') {
+                  return;
+                }
                 command.option(flag, ctx.data[flag] as matter.Options);
               });
               return command.usage(ctx.usage || null).help('help');
             },
             async argv => {
+              const [, destination] = argv._;
               const flags = ctx.flags.reduce((acc, flag) => {
                 if (argv[flag] !== 'undefined') {
                   if (argv[flag] !== 'undefined') {
@@ -106,7 +110,13 @@ async function makeCtx(filename: string): Promise<Context> {
               }, {});
 
               const result = Handlebars.compile(ctx.content)(flags);
-              render(<Container content={result.trim()} flags={flags} />);
+              render(
+                <Container
+                  content={result.trim()}
+                  flags={flags}
+                  output={path.resolve(destination)}
+                />,
+              );
             },
           );
         });

@@ -15,8 +15,6 @@ export class Less extends Component {
       rows: contentLineLength < props.rows ? contentLineLength : props.rows,
       scrollLine: 0,
     };
-    // console.log(this.state);
-    // process.exit(0);
   }
 
   private get viewableContent() {
@@ -28,7 +26,7 @@ export class Less extends Component {
   }
 
   public render(props) {
-    clear();
+    // clear();
     return <div>{this.viewableContent}</div>;
   }
 
@@ -39,7 +37,7 @@ export class Less extends Component {
   }
 
   public componentDidMount() {
-    process.stdin.on('keypress', (ch, key) => {
+    process.stdin.on('keypress', async (ch, key) => {
       if (!key) {
         return;
       }
@@ -62,23 +60,15 @@ export class Less extends Component {
         }
         case 'return' /* enter */:
         case 'y': {
-          this.props.save();
+          await this.props.save();
+          break;
         }
-        case 'n':
+        case 'n': {
+          process.exit(0);
+          break;
+        }
         default:
       }
     });
   }
-
-  // componentDidMount() {
-  //   this.timer = setInterval(() => {
-  //     this.setState({
-  //       i: this.state.i + 1
-  //     });
-  //   }, 100);
-  // }
-  //
-  // componentWillUnmount() {
-  //   clearInterval(this.timer);
-  // }
 }

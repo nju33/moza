@@ -1,2 +1,2 @@
-export * from './flex-col';
+export * from './view';
 export * from './less';

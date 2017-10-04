@@ -1,47 +1,46 @@
-type AToZ =
-  | 'a'
-  | 'b'
-  | 'c'
-  | 'd'
-  | 'e'
-  | 'f'
-  | 'g'
-  | 'h'
-  | 'i'
-  | 'j'
-  | 'k'
-  | 'l'
-  | 'm'
-  | 'n'
-  | 'o'
-  | 'p'
-  | 'q'
-  | 'r'
-  | 's'
-  | 't'
-  | 'u'
-  | 'v'
-  | 'w'
-  | 'x'
-  | 'y'
-  | 'z';
-
 declare module 'gray-matter' {
-  interface ContextData {
-    alias?: AToZ;
-    default?: any;
-    demandOption?: boolean;
-    describe?: string;
-    type?: 'array' | 'boolean' | 'count' | 'number' | 'string';
-  }
-
   namespace matter {
     export interface Context {
       content: string;
       excerpt: string;
       data: {
-        [flag: string]: ContextData | string;
+        [flag: string]: Options;
       };
+    }
+
+    export type Choice = string | true | undefined;
+    export type Choices = Choice[];
+
+    export interface Options {
+      alias?: string | string[];
+      array?: boolean;
+      boolean?: boolean;
+      choices?: Choices;
+      coerce?: (arg: any) => any;
+      config?: boolean;
+      configParser?: (configPath: string) => object;
+      conflicts?: string | object;
+      count?: boolean;
+      default?: any;
+      defaultDescription?: string;
+      /** @deprecated since version 6.6.0 */
+      demand?: boolean | string;
+      demandOption?: boolean | string;
+      desc?: string;
+      describe?: string;
+      description?: string;
+      global?: boolean;
+      group?: string;
+      implies?: string | object;
+      nargs?: number;
+      normalize?: boolean;
+      number?: boolean;
+      require?: boolean | string;
+      required?: boolean | string;
+      requiresArg?: boolean | string;
+      skipValidation?: boolean;
+      string?: boolean;
+      type?: 'array' | 'boolean' | 'count' | 'number' | 'string';
     }
   }
 

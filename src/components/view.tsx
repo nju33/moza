@@ -1,7 +1,7 @@
 import {Component, h} from 'ink';
 import termSize = require('term-size');
 
-export class FlexCol extends Component {
+export class View extends Component {
   private props: {
     children: Array<{props: {size?: number; rows?: number}; children: any[]}>;
   };

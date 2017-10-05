@@ -1,5 +1,5 @@
+import * as chalk from 'chalk';
 import * as fs from 'fs';
-import * as glob from 'glob';
 import matter = require('gray-matter');
 import * as Handlebars from 'handlebars';
 import {Component, h, render, Text} from 'ink';
@@ -8,7 +8,7 @@ import * as R from 'ramda';
 import {promisify} from 'util';
 import * as yargs from 'yargs';
 import {Container} from './container';
-import {formatMatter, loadFile, parse} from './helpers';
+import {formatMatter, loadFile, parse, pglob} from './helpers';
 
 process.on('unhandledRejection', (reason, p) => {
   // tslint:disable-next-line no-console
@@ -38,7 +38,7 @@ interface Context extends matter.Context {
 function getData(data: {[flag: string]: matter.Options}, flag: string): string {
   try {
     return data.CONFIG[flag]!.default;
-  } catch {
+  } catch (_) {
     return '';
   }
 }
@@ -64,64 +64,73 @@ async function makeCtx(filename: string): Promise<Context> {
   };
 }
 
+// tslint:disable-next-line
 (async () => {
   const filePatterns = [
     path.join(process.env.HOME, '.config/moza/*'),
     path.join(process.cwd(), '.moza/*'),
   ];
 
-  await Promise.all(
-    filePatterns.map(filePattern => {
-      glob(filePattern, async (err, filenames) => {
-        const ctxPromises = filenames.map(makeCtx);
+  const setPromises = filePatterns.map(async filePattern => {
+    const set = await pglob(filePattern);
+    return set;
+  });
+  const filenamesSet = await Promise.all(setPromises);
+  const filenames = filenamesSet.reduce((acc, set) => [...acc, ...set], []);
 
-        const ctxs: Context[] = await Promise.all(ctxPromises);
+  const ctxPromises = filenames.map(makeCtx);
+  const ctxs: Context[] = await Promise.all(ctxPromises);
 
-        ctxs.forEach(ctx => {
-          yargs.command(
-            ctx.commandName,
-            (() => {
-              try {
-                return ctx.data.description!.default;
-              } catch {
-                return '';
-              }
-            })(),
-            command => {
-              ctx.flags.forEach(flag => {
-                if (flag === 'CONFIG') {
-                  return;
-                }
-                command.option(flag, ctx.data[flag] as matter.Options);
-              });
-              return command.usage(ctx.usage || null).help('help');
-            },
-            async argv => {
-              const [, destination] = argv._;
-              const flags = ctx.flags.reduce((acc, flag) => {
-                if (argv[flag] !== 'undefined') {
-                  if (argv[flag] !== 'undefined') {
-                    acc[flag] = argv[flag];
-                  } else if (ctx.data[flag].default) {
-                    acc[flag] = ctx.data[flag].default;
-                  }
-                }
-                return acc;
-              }, {});
+  ctxs.forEach(ctx => {
+    yargs.command(
+      ctx.commandName,
+      (() => {
+        try {
+          return ctx.data.description!.default;
+        } catch (_) {
+          return '';
+        }
+      })(),
+      command => {
+        ctx.flags.forEach(flag => {
+          if (flag === 'CONFIG') {
+            return;
+          }
 
-              const result = Handlebars.compile(ctx.content)(flags);
-              render(
-                <Container
-                  content={result.trim()}
-                  flags={flags}
-                  output={path.resolve(destination)}
-                />,
-              );
-            },
-          );
+          command.option(flag, ctx.data[flag] as matter.Options);
         });
-        return yargs.argv;
-      });
-    }),
-  );
+        return command.usage(ctx.usage || null).help('help');
+      },
+      async argv => {
+        const [, destination] = argv._;
+        if (destination === undefined) {
+          // tslint:disable-next-line no-console
+          console.error(
+            chalk.red('Expected second arguments for destination path'),
+          );
+          process.exit(1);
+        }
+
+        const flags = ctx.flags.reduce((acc, flag) => {
+          acc[flag] = argv[flag];
+          if (acc[flag] === null || acc[flag] === undefined) {
+            acc[flag] = ctx.data[flag].default;
+          }
+          return acc;
+        }, {});
+
+        const result = Handlebars.compile(ctx.content)(flags);
+        render(
+          <Container
+            content={result.trim()}
+            flags={flags}
+            output={path.resolve(destination)}
+          />,
+        );
+      },
+    );
+  });
+
+  return yargs.usage('$ moza <comand> [command-options] <destination-path>')
+    .argv;
 })();

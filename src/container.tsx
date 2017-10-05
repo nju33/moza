@@ -43,9 +43,17 @@ export class Container extends Component {
     }
   }
 
+  public async ensureFile(filename: string): Promise<void> {
+    await promisify(fs.writeFile)(filename, '');
+  }
+
   public async ensureNotExistsFile(filename: string): Promise<never | void> {
-    await promisify(fs.access)(filename, fs.constants.F_OK);
-    throw new Error('Its file is already exists. Overwrite?');
+    try {
+      await promisify(fs.access)(filename, fs.constants.F_OK);
+      throw new Error('Its file is already exists. Overwrite?');
+    } catch (_) {
+      this.ensureFile(filename);
+    }
   }
 
   public componentDidUpdate() {

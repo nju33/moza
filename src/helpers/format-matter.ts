@@ -3,7 +3,7 @@ export function formatMatter<
 >(ctx: C): C {
   Object.keys(ctx.data).forEach(item => {
     const target = ctx.data[item];
-    if (typeof target !== 'object') {
+    if (typeof target !== 'object' || target === null) {
       ctx.data[item] = {default: target};
     }
   });

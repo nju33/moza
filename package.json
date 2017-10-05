@@ -11,6 +11,7 @@
     "gray-matter": "^3.0.7",
     "handlebars": "^4.0.10",
     "ink": "^0.3.1",
+    "is-url": "^1.2.2",
     "mkdirp": "^0.5.1",
     "ramda": "^0.24.1",
     "term-size": "^1.2.0",
@@ -20,7 +21,9 @@
   },
   "devDependencies": {
     "@types/glob": "^5.0.32",
+    "@types/got": "^7.1.4",
     "@types/handlebars": "^4.0.36",
+    "@types/is-url": "^1.2.28",
     "@types/mkdirp": "^0.5.1",
     "@types/node": "^8.0.30",
     "@types/ramda": "^0.24.14",

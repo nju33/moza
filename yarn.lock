@@ -9,9 +9,19 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
+"@types/got@^7.1.4":
+  version "7.1.4"
+  resolved "https://registry.yarnpkg.com/@types/got/-/got-7.1.4.tgz#9fdf7ee8d8d2f3f1309320e1403336ea4f1b0c80"
+  dependencies:
+    "@types/node" "*"
+
 "@types/handlebars@^4.0.36":
   version "4.0.36"
   resolved "https://registry.yarnpkg.com/@types/handlebars/-/handlebars-4.0.36.tgz#ff57c77fa1ab6713bb446534ddc4d979707a3a79"
+
+"@types/is-url@^1.2.28":
+  version "1.2.28"
+  resolved "https://registry.yarnpkg.com/@types/is-url/-/is-url-1.2.28.tgz#914dabd50546d9b0142806e42c72bc7c2b7e0787"
 
 "@types/minimatch@*":
   version "3.0.1"
@@ -458,6 +468,10 @@ is-retry-allowed@^1.0.0:
 is-stream@^1.0.0, is-stream@^1.0.1, is-stream@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/is-stream/-/is-stream-1.1.0.tgz#12d4a3dd4e68e0b79ceb8dbc84173ae80d91ca44"
+
+is-url@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/is-url/-/is-url-1.2.2.tgz#498905a593bf47cc2d9e7f738372bbf7696c7f26"
 
 isexe@^2.0.0:
   version "2.0.0"

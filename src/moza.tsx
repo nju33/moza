@@ -1,8 +1,10 @@
 import * as chalk from 'chalk';
 import * as fs from 'fs';
+import * as got from 'got';
 import matter = require('gray-matter');
 import * as Handlebars from 'handlebars';
 import {Component, h, render, Text} from 'ink';
+import isUrl = require('is-url');
 import * as path from 'path';
 import * as R from 'ramda';
 import {promisify} from 'util';
@@ -131,6 +133,17 @@ async function makeCtx(filename: string): Promise<Context> {
     );
   });
 
-  return yargs.usage('$ moza <comand> [command-options] <destination-path>')
-    .argv;
+  const args = yargs.usage(
+    '$ moza <comand | url> [command-options] <destination-path>',
+  ).argv;
+
+  const [url] = args._;
+  if (!isUrl(url)) {
+    // tslint:disable-next-line no-console
+    console.error(chalk.red('Specify command or url to first argument'));
+    process.exit(1);
+  }
+
+  const response = await got(url);
+  console.log();
 })();

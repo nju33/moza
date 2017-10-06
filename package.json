@@ -6,6 +6,7 @@
   "license": "MIT",
   "dependencies": {
     "clear": "^0.0.1",
+    "cli-table2": "^0.2.0",
     "glob": "^7.1.2",
     "got": "^7.1.0",
     "gray-matter": "^3.0.7",
@@ -20,6 +21,7 @@
     "yargs": "^9.0.1"
   },
   "devDependencies": {
+    "@types/cli-table2": "^0.2.1",
     "@types/glob": "^5.0.32",
     "@types/got": "^7.1.4",
     "@types/handlebars": "^4.0.36",

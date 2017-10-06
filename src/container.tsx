@@ -5,8 +5,12 @@ import * as mkdirp from 'mkdirp';
 import * as path from 'path';
 import {promisify} from 'util';
 import {Less, View} from './components';
+import {ensureDir, ensureFile} from './helpers';
 
 export class Container extends Component {
+  public ensureDir: typeof ensureDir;
+  public ensureFile: typeof ensureFile;
+
   private props: {
     content: string;
     flags: {
@@ -27,24 +31,13 @@ export class Container extends Component {
       error: null,
       saved: false,
     };
+
+    this.ensureDir = ensureDir;
+    this.ensureFile = ensureFile;
   }
 
   private get output() {
     return path.resolve(this.props.output);
-  }
-
-  public async ensureDir(): Promise<void> {
-    try {
-      await promisify(mkdirp)(path.dirname(this.output));
-    } catch (err) {
-      // tslint:disable-next-line no-console
-      console.error(chalk.red(err.essage));
-      process.exit(1);
-    }
-  }
-
-  public async ensureFile(filename: string): Promise<void> {
-    await promisify(fs.writeFile)(filename, '');
   }
 
   public async ensureNotExistsFile(filename: string): Promise<never | void> {
@@ -68,7 +61,7 @@ export class Container extends Component {
         <Less
           content={this.props.content}
           save={async () => {
-            await this.ensureDir();
+            await this.ensureDir(path.dirname(this.output));
 
             try {
               await this.ensureNotExistsFile(this.output);

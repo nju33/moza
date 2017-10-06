@@ -25,18 +25,6 @@ process.on('unhandledRejection', (reason, p) => {
   console.error(reason);
 });
 
-Handlebars.registerHelper('wrap', (mark: string, str: string) => {
-  return `${mark}${str}${mark}`;
-});
-
-Handlebars.registerHelper('double-quote', (str: string) => {
-  return `"${str}"`;
-});
-
-Handlebars.registerHelper('dq', (str: string) => {
-  return `"${str}"`;
-});
-
 interface Context extends matter.Context {
   filename: string;
   scope: string;
@@ -161,6 +149,7 @@ function makeCtx(
           return acc;
         }, {});
 
+        require('./handlebars-helpers');
         const result = Handlebars.compile(ctx.content)(flags);
         render(
           <Container

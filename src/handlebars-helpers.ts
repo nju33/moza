@@ -1,21 +1,18 @@
 import * as Handlebars from 'handlebars';
 
-Handlebars.registerHelper('wrap', (mark: string, str: string) => {
+export function wrap(mark: string, str: string) {
   return `${mark}${str}${mark}`;
-});
+}
+Handlebars.registerHelper('wrap', wrap);
 
-Handlebars.registerHelper('double-quote', (str: string) => {
+export function doubleQuote(str: string) {
   return `"${str}"`;
-});
+}
+Handlebars.registerHelper('double-quote', doubleQuote);
+Handlebars.registerHelper('dq', doubleQuote);
 
-Handlebars.registerHelper('dq', (str: string) => {
-  return `"${str}"`;
-});
-
-Handlebars.registerHelper('single-quote', (str: string) => {
+export function singleQuote(str: string) {
   return `'${str}'`;
-});
-
-Handlebars.registerHelper('sq', (str: string) => {
-  return `'${str}'`;
-});
+}
+Handlebars.registerHelper('single-quote', singleQuote);
+Handlebars.registerHelper('sq', singleQuote);

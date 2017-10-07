@@ -7,72 +7,17 @@ import * as Handlebars from 'handlebars';
 import {Component, h, render, Text} from 'ink';
 import isUrl = require('is-url');
 import * as path from 'path';
-import * as R from 'ramda';
 import {promisify} from 'util';
 import * as yargs from 'yargs';
 import {Container} from './container';
-import {
-  ensureDir,
-  ensureFile,
-  formatMatter,
-  loadFile,
-  parse,
-  pglob,
-} from './helpers';
+import {Context} from './context';
+import {ensureDir, ensureFile, formatMatter, pglob} from './helpers';
 
 process.on('unhandledRejection', (reason, p) => {
   // tslint:disable-next-line no-console
   console.error(reason);
 });
 
-interface Context extends matter.Context {
-  filename: string;
-  scope: string;
-  commandName: string;
-  description: string;
-  usage: string;
-  flags: string[];
-}
-
-function getData(data: {[flag: string]: matter.Options}, flag: string): string {
-  try {
-    return data.CONFIG[flag]!.default;
-  } catch (_) {
-    return '';
-  }
-}
-
-function makeCtx(
-  filename: string,
-  content: string,
-  scope: 'global' | 'local',
-): Context {
-  const ctx = formatMatter(matter(content));
-  return {
-    filename,
-    scope,
-    get commandName() {
-      return path.basename(this.filename, '.hbs');
-    },
-    get description() {
-      return getData(this.data, 'description');
-    },
-    get usage() {
-      return getData(this.data, 'usage');
-    },
-    get flags() {
-      return Object.keys(ctx.data).filter(flag => {
-        if (flag === 'CONFIG') {
-          return false;
-        }
-        return true;
-      });
-    },
-    ...ctx,
-  };
-}
-
-// tslint:disable-next-line
 (async () => {
   const filePatterns = [
     path.join(process.env.HOME, '.config/moza/*'),
@@ -92,8 +37,8 @@ function makeCtx(
       const filenameSet = await filenameSetPromise;
       const ctxsSet: Context[] = await Promise.all(
         filenameSet.map(async filename => {
-          const content = await loadFile(filename);
-          return makeCtx(filename, content, scope);
+          const content = await promisify(fs.readFile)(filename, 'utf-8');
+          return new Context(filename, content, scope);
         }),
       );
       return ctxsSet;
@@ -123,8 +68,8 @@ function makeCtx(
         }
       })(),
       command => {
-        ctx.flags.forEach((flag, i) => {
-          command.option(flag, ctx.data[flag] as matter.Options);
+        ctx.forEachFlag((flag, data) => {
+          command.option(flag, data);
         });
         return command
           .group(ctx.flags, 'Variables:')
@@ -142,9 +87,10 @@ function makeCtx(
         }
 
         const flags = ctx.flags.reduce((acc, flag) => {
-          acc[flag] = argv[flag];
-          if (acc[flag] === null || acc[flag] === undefined) {
-            acc[flag] = ctx.data[flag].default;
+          const originalFlag = ctx.getOriginalProp(flag);
+          acc[originalFlag] = argv[flag];
+          if (acc[originalFlag] === null || acc[originalFlag] === undefined) {
+            acc[originalFlag] = ctx.data[flag].default;
           }
           return acc;
         }, {});
@@ -202,14 +148,6 @@ function makeCtx(
     'add',
     'Fetch a template',
     command => {
-      // ctx.flags.forEach(flag => {
-      //   if (flag === 'CONFIG') {
-      //     return;
-      //   }
-      //
-      //   command.option(flag, ctx.data[flag] as matter.Options);
-      // });
-      // return command.usage(ctx.usage || null).help('help');
       return command
         .option('global', {
           alias: 'g',

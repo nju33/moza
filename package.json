@@ -1,7 +1,10 @@
 {
   "name": "moza",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "0.0.0",
+  "main": "./dist/moza.js",
+  "bin": {
+    "moza": "./dist/moza.js",
+  },
   "author": "nju33 <nju33.ki@gmail.com>",
   "license": "MIT",
   "dependencies": {

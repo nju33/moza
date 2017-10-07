@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import * as chalk from 'chalk';
 import * as Table from 'cli-table2';
 import * as fs from 'fs';

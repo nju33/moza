@@ -31,12 +31,13 @@
     "@types/node": "^8.0.30",
     "@types/ramda": "^0.24.14",
     "@types/yargs": "^8.0.2",
+    "codecov": "^2.3.0",
     "jest": "^21.2.1",
     "ts-jest": "^21.1.0",
     "ts-node": "^3.3.0"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest && codecov"
   },
   "jest": {
     "transform": {
@@ -49,6 +50,8 @@
       "js",
       "jsx",
       "json"
-    ]
+    ],
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true
   }
 }

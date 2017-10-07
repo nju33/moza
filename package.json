@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "main": "./dist/moza.js",
   "bin": {
-    "moza": "./dist/moza.js",
+    "moza": "./dist/moza.js"
   },
+  "repository": "nju33/moza",
   "author": "nju33 <nju33.ki@gmail.com>",
   "license": "MIT",
   "dependencies": {

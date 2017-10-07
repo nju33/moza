@@ -1,34 +1,50 @@
 ---
 CONFIG:
+  filename: tsconfig.json
   description: test description
   usage: 'aaa'
 
-hoge:
-  alias: h
-  demandOption: true
-  type: string
-foo:
+NOTE: |
+  `preact`や`ink`を使う場合は、`--jsx-factory`に`h`を指定
+
 lib:
   alias: l
   default:
-    - es2015
     - es2016
     - es2017
-  type: array
-target: es5
+    - es2017.object
+target: es6
+jsx:
+  default: false
+  type: boolean
+jsxFactory:
+  default: React.Component
+  type: string
+  choices:
+    - React.Component
+    - h
 module: commonjs
 ---
 
 
 {
   "compilerOptions": {
-    "target": {{{dq target}}},
-    "module": "commonjs",
+    "target": "{{target}}",
+    "module": "{{module}}",
     "lib": [
       {{#each lib}}
-      {{{dq this}}}{{#unless @last}},{{/unless}}
+      "{{this}}"{{#unless @last}},{{/unless}}
       {{/each}}
     ],
-    "strict": true
-  }
+    {{#if jsx}}
+    "jsx": "React",
+    "jsxFactory": "{{jsxFactory}}",
+    {{/if}}
+    "strict": true,
+    "sourceMap": true
+  },
+  include: [
+    "./src/**/*.ts",
+    "./src/**/*.tsx"
+  ]
 }

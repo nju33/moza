@@ -32,6 +32,10 @@ test('Context', () => {
 CONFIG:
   description: description
   usage: usage
+NOTE: |
+  foo
+  bar
+  baz
 foo: foo
 barBaz:
   type: array
@@ -46,6 +50,7 @@ hoge`;
   expect(ctx.commandName).toBe('bar');
   expect(ctx.description).toBe('description');
   expect(ctx.usage).toBe('usage');
+  expect(ctx.note.trim()).toBe('foo\nbar\nbaz');
   expect(ctx.flags).toMatchObject(['foo', 'bar-baz']);
 
   expect(ctx.getOriginalProp(ctx.flags[1])).toBe('barBaz');

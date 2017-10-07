@@ -6,6 +6,7 @@ import matter = require('gray-matter');
 import * as Handlebars from 'handlebars';
 import {Component, h, render, Text} from 'ink';
 import isUrl = require('is-url');
+import compact = require('lodash.compact');
 import * as path from 'path';
 import {promisify} from 'util';
 import * as yargs from 'yargs';
@@ -19,10 +20,12 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 (async () => {
-  const filePatterns = [
-    path.join(process.env.HOME, '.config/moza/*'),
+  const filePatterns = compact([
+    process.env.HOME !== undefined
+      ? path.join(process.env.HOME!, '.config/moza/*')
+      : null,
     path.join(process.cwd(), '.moza/*'),
-  ];
+  ]);
 
   const ctxsAllPromises = filePatterns
     .map(filePattern => pglob(filePattern))
@@ -49,7 +52,7 @@ process.on('unhandledRejection', (reason, p) => {
         const ctxsSet = await ctxsSetPromise;
         return [...acc, ...ctxsSet];
       },
-      [] as Promise<Context[]> | undefined[],
+      [] as Promise<Context[]> | never[],
     );
 
   if (Array.isArray(ctxsAllPromises)) {
@@ -57,7 +60,7 @@ process.on('unhandledRejection', (reason, p) => {
   }
 
   const ctxs = await ctxsAllPromises;
-  ctxs.forEach(ctx => {
+  ctxs.forEach((ctx: Context) => {
     yargs.command(
       ctx.commandName,
       (() => {
@@ -73,7 +76,7 @@ process.on('unhandledRejection', (reason, p) => {
         });
         return command
           .group(ctx.flags, 'Variables:')
-          .usage(ctx.usage || null)
+          .usage(ctx.usage || '')
           .help('help');
       },
       async argv => {
@@ -86,14 +89,17 @@ process.on('unhandledRejection', (reason, p) => {
           process.exit(1);
         }
 
-        const flags = ctx.flags.reduce((acc, flag) => {
-          const originalFlag = ctx.getOriginalProp(flag);
-          acc[originalFlag] = argv[flag];
-          if (acc[originalFlag] === null || acc[originalFlag] === undefined) {
-            acc[originalFlag] = ctx.data[flag].default;
-          }
-          return acc;
-        }, {});
+        const flags = ctx.flags.reduce(
+          (acc, flag) => {
+            const originalFlag = ctx.getOriginalProp(flag);
+            acc[originalFlag] = argv[flag];
+            if (acc[originalFlag] === null || acc[originalFlag] === undefined) {
+              acc[originalFlag] = ctx.data[flag].default;
+            }
+            return acc;
+          },
+          {} as {[p: string]: any},
+        );
 
         require('./handlebars-helpers');
         const result = Handlebars.compile(ctx.content)(flags);
@@ -125,7 +131,7 @@ process.on('unhandledRejection', (reason, p) => {
       const table = new Table({
         head: ['Command', 'Path'],
       });
-      ctxs.forEach(ctx => {
+      ctxs.forEach((ctx: Context) => {
         if (argv.global && ctx.scope === 'global') {
           /**
            * 型がおかしいので`any`化
@@ -141,6 +147,35 @@ process.on('unhandledRejection', (reason, p) => {
       // tslint:disable-next-line no-console
       console.log(table.toString());
       process.exit(0);
+    },
+  );
+
+  yargs.command(
+    'note',
+    'Show command note',
+    command => {
+      return command.usage('$ moza note <command>').help();
+    },
+    argv => {
+      const [, targetName] = argv._;
+      if (!targetName) {
+        // tslint:disable-next-line no-console
+        console.error(chalk.red('Specify command name for first argument'));
+        process.exit(1);
+      }
+
+      const targetCtx = ctxs.find(ctx => ctx.commandName === targetName);
+      if (targetCtx === undefined) {
+        // tslint:disable-next-line no-console
+        console.error(chalk.red('The specified command name does not exist'));
+        process.exit(1);
+      } else {
+        // tslint:disable-next-line no-console
+        console.log(`
+${chalk.yellow('##')} ${chalk.bold(targetCtx.commandName)}
+
+${targetCtx.note}`);
+      }
     },
   );
 

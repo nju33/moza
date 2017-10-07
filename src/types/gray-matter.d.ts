@@ -41,6 +41,8 @@ declare module 'gray-matter' {
       skipValidation?: boolean;
       string?: boolean;
       type?: 'array' | 'boolean' | 'count' | 'number' | 'string';
+
+      [key: string]: any;
     }
   }
 

@@ -7,25 +7,25 @@ import {promisify} from 'util';
 import {Less, View} from './components';
 import {ensureDir, ensureFile} from './helpers';
 
-export class Container extends Component {
+interface Props {
+  content: string;
+  flags: {
+    filename: string;
+    [prop: string]: any;
+  };
+  output: string;
+}
+
+interface State {
+  error: string | null;
+  saved: boolean;
+}
+
+export class Container extends Component<Props, State> {
   public ensureDir: typeof ensureDir;
   public ensureFile: typeof ensureFile;
 
-  private props: {
-    content: string;
-    flags: {
-      filename: string;
-      [prop: string]: any;
-    };
-    output: string;
-  };
-
-  private state: {
-    saved: boolean;
-    error: string;
-  };
-
-  private constructor(props) {
+  private constructor(props: Props) {
     super(props);
     this.state = {
       error: null,

@@ -4,7 +4,10 @@ import * as path from 'path';
 import {formatMatter} from './helpers';
 
 export class Context {
-  public static toKebabProps(obj: object, ignoreProps?: string[]): object {
+  public static toKebabProps(
+    obj: {[p: string]: any},
+    ignoreProps?: string[],
+  ): object {
     return Object.keys(obj).reduce(
       ([data, propMap], originalKey) => {
         let key = originalKey;
@@ -18,24 +21,32 @@ export class Context {
         data[key] = obj[originalKey];
         return [data, propMap];
       },
-      [{}, {}],
+      [{}, {}] as [{[p: string]: any}, {[p: string]: any}],
     );
   }
 
   public filename: string;
   public scope: ContextScope;
+  public config?: {
+    filename?: string;
+    description?: string;
+    usage?: string;
+  };
+  public note?: string;
   public data: ContextData;
   public content: string;
-  private propMap: object;
+  private propMap: {[prop: string]: any};
 
   constructor(filename: string, content: string, scope: ContextScope) {
     const ctx = formatMatter(matter(content));
     this.filename = filename;
     this.scope = scope;
-    const [data, propMap] = Context.toKebabProps(ctx.data, ['CONFIG']) as [
-      ContextData,
-      object
-    ];
+    const [data, propMap] = Context.toKebabProps(ctx.data, [
+      'CONFIG',
+      'NOTE',
+    ]) as [ContextData, object];
+    this.config = (ctx.data as any).CONFIG;
+    this.note = (ctx.data as any).NOTE;
     this.data = data;
     this.propMap = propMap;
     this.content = ctx.content;
@@ -51,11 +62,11 @@ export class Context {
     });
   }
 
-  private getData(flag: string): string {
+  private getData(flag: ContextConfigType): matter.Options | string | false {
     try {
-      return this.data.CONFIG[flag] || '';
+      return this.config![flag] || false;
     } catch (_) {
-      return '';
+      return false;
     }
   }
 
@@ -63,17 +74,17 @@ export class Context {
     return path.basename(this.filename, '.hbs');
   }
 
-  public get description(): string {
-    return this.getData('description');
+  public get description(): string | undefined {
+    return this.getData('description') as string;
   }
 
-  public get usage(): string {
-    return this.getData('usage');
+  public get usage(): string | undefined {
+    return this.getData('usage') as string;
   }
 
   public get flags(): string[] {
     return Object.keys(this.data).filter(flag => {
-      if (flag === 'CONFIG') {
+      if (flag === 'CONFIG' || flag === 'NOTE') {
         return false;
       }
       return true;
@@ -82,6 +93,7 @@ export class Context {
 }
 
 export type ContextScope = 'global' | 'local';
+export type ContextConfigType = 'filename' | 'description' | 'usage';
 export interface ContextData {
   [flag: string]: matter.Options;
 }

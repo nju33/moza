@@ -1,12 +1,18 @@
 import * as clear from 'clear';
 import {Component, h, render} from 'ink';
 
-export class Less extends Component {
-  public props: {rows: number; content: string; save(): void};
+interface Props {
+  rows: number;
+  content: string;
+  save(): void;
+}
+
+export class Less extends Component<Props> {
+  // public props: Props;
   public state: any;
   private setState: any;
 
-  private constructor(props) {
+  private constructor(props: Props) {
     super(props);
 
     const contentLineLength = props.content.split('\n').length;
@@ -25,8 +31,8 @@ export class Less extends Component {
       .join('\n');
   }
 
-  public render(props) {
-    // clear();
+  public render(props: Props) {
+    clear();
     return <div>{this.viewableContent}</div>;
   }
 

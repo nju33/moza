@@ -1,0 +1,25 @@
+---
+tab:
+  default: false
+  type: boolean
+singleQuote:
+  default: true
+  type: boolean
+parser:
+  default: babyron
+  choices:
+    - babyron
+    - flow
+    - typescript
+  type: string
+---
+
+{
+    "useTabs": {{tab}},
+    "printWidth": 80,
+    "singleQuote": {{singleQuote}},
+    "trailingComma": "all",
+    "jsxBracketSameLine": false,
+    "parser": "{{parser}}",
+    "noSemi": true
+}

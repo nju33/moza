@@ -1,17 +1,17 @@
 import {Component, h} from 'ink';
 import termSize = require('term-size');
 
-export class View extends Component {
-  private props: {
-    children: Array<{props: {size?: number; rows?: number}; children: any[]}>;
-  };
+interface Props {
+  children: Array<{props: {size?: number; rows?: number}; children: any[]}>;
+}
 
-  private state: {
-    rows: number;
-    columns: number;
-  };
+interface State {
+  rows: number;
+  columns: number;
+}
 
-  constructor(props) {
+export class View extends Component<Props, State> {
+  constructor(props: Props) {
     super(props);
 
     this.state = {

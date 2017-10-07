@@ -44,8 +44,12 @@ export class Container extends Component<Props, State> {
     try {
       await promisify(fs.access)(filename, fs.constants.F_OK);
       throw new Error('Its file is already exists. Overwrite?');
-    } catch (_) {
-      this.ensureFile(filename);
+    } catch (err) {
+      if (err.message.includes('Overwrite?')) {
+        throw err;
+      } else {
+        this.ensureFile(filename);
+      }
     }
   }
 

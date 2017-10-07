@@ -66,7 +66,7 @@ process.on('unhandledRejection', (reason, p) => {
       ctx.commandName,
       (() => {
         try {
-          return ctx.data.description!.default;
+          return ctx.description!;
         } catch (_) {
           return '';
         }

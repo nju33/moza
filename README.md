@@ -35,7 +35,7 @@ moza --help
 And it is now possible to pass the `text` flag.
 
 ```bash
-moza foo --help
+moza html --help
 # Variables
 #   --text
 ```

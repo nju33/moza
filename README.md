@@ -58,7 +58,7 @@ moza html --text baz path/to/baz.html
 
 ### `ls`
 
-Show enabled command list on put the locally(`./.moza/*.hbs`). When add `--global` falg,  globally(`~/.config/moza/*.hbs`) command list is shown.
+Show enabled command list on put the local(`./.moza/*.hbs`). When add `--global` falg,  global(`~/.config/moza/*.hbs`) command list is shown.
 
 ```bash
 moza ls

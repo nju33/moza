@@ -42,9 +42,9 @@ moza foo --help
 
 > The entity of this `text` object is an [option of yargs](https://github.com/yargs/yargs/blob/master/docs/api.md#optionskey-opt). When the `string` is set as above, it is converted as follows.
 > ```yaml
-text:
-  default: foo
-```
+> text:
+>  default: foo
+> ```
 
 After that, just do it like this.
 

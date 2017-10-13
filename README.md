@@ -21,7 +21,7 @@ Place `*.hbs` under `./.moza/` or `~/.config/moza/` directory. The contents are 
 text: foo
 ---
 
-<p>{{foo}}</p>
+<p>{{text}}</p>
 ```
 
 Suppose you put this as `html.hbs`. Then, The `html` command is enabled.

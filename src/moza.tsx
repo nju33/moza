@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import * as chalk from 'chalk';
-import * as Table from 'cli-table2';
+import * as Table from 'cli-table3';
 import * as fs from 'fs';
 import * as got from 'got';
 import matter = require('gray-matter');

@@ -10,7 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "clear": "^0.0.1",
-    "cli-table2": "^0.2.0",
+    "cli-table3": "^0.5.0",
     "glob": "^7.1.2",
     "got": "^7.1.0",
     "gray-matter": "^3.0.7",
